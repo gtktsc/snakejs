@@ -8,19 +8,18 @@
     var tail = [];
     var apple;
     var animation;
+    var snakeSize = 40;
     
     function restart(){
-        head = new Rectangle ( (Math.floor(window.innerWidth / 20)/2) * 20 , (Math.floor(window.innerHeight / 20)/2) * 20 - 40 , "silver" , 20 , -1);
-        apple = new Apple ("green" , 20);
+        head = new Rectangle ( (Math.floor(window.innerWidth / snakeSize)/2) * snakeSize , (Math.floor(window.innerHeight / snakeSize)/2) * snakeSize - snakeSize * 2 , "silver" , snakeSize , -1);
+        apple = new Apple ("green" , snakeSize);
         tail = [];
         for(var i=0 ; i < 2 ; i++){
-            tail[i] = new Rectangle (head.x , head.y-20 * (i + 1) , "black" , 20 , i);
+            tail[i] = new Rectangle (head.x , head.y-snakeSize * (i + 1) , "black" , snakeSize , i);
         };
         clearInterval(animation);
         animation = setInterval(draw , 200);
     };
-
-
 
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -47,7 +46,7 @@
         };
         if(head.color==="red"){
             restart();
-        }
+        };
     };
 
     window.addEventListener('resize' , resizeCanvas , false);
@@ -119,7 +118,7 @@
         this.color=color;
         this.draw = function() {
             if(this.x === head.x && this.y === head.y){
-                tail.push(new Rectangle(tail[tail.length-1].x , tail[tail.length - 1].y - 20 , "black" , 20 , tail.length));
+                tail.push(new Rectangle(tail[tail.length-1].x , tail[tail.length - 1].y - snakeSize , "black" , snakeSize , tail.length));
                 this.x = Math.floor(Math.random() * (Math.floor(window.innerWidth / this.size) + 1)) * this.size;
                 this.y = Math.floor(Math.random() * (Math.floor(window.innerHeight / this.size) + 1)) * this.size;
             };

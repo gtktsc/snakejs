@@ -10,7 +10,7 @@
     var apple;
     var animation;
     var color;
-    var snakeSize = 40;
+    var snakeSize = Math.floor(canvasWidth/30);
     var backgroundTile=[];
     var backgroundColor = "white";
     var backgroundLine = snakeSize/3;

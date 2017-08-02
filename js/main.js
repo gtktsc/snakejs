@@ -19,12 +19,12 @@
     var sumY = (Math.floor(canvasHeight / snakeSize)%2==0?sumY = Math.floor(canvasHeight / snakeSize) : sumY = Math.floor(canvasHeight / snakeSize)-1);
 
     function restart(){
-        head = new Rectangle ( (Math.floor(sumX)/2) * snakeSize , (Math.floor(sumY)/2) * snakeSize - snakeSize * 2 , "#A6A099" , snakeSize , -1);
+        head = new Rectangle ( (Math.floor(sumX)/2) * snakeSize , (Math.floor(sumY)/2) * snakeSize - snakeSize * 2 , "#A6A099" , -1);
         setColor();
-        apple = new Apple (color , snakeSize);
+        apple = new Apple (color);
         tail = [];
         for(var i=0 ; i < 2 ; i++){
-            tail[i] = new Rectangle (head.x , head.y-snakeSize * (i + 1) , "#414143" , snakeSize , i);
+            tail[i] = new Rectangle (head.x , head.y-snakeSize * (i + 1) , "#414143" , i);
         };
         var nr=0;
         for(var nrX=0;nrX<sumX;nrX++){
@@ -67,7 +67,6 @@
 
         restart();
     };
-
     function draw() {
         context.beginPath();
         context.clearRect(0 , 0 , canvasWidth , canvasHeight);
@@ -90,40 +89,18 @@
             restart();
         };
     };
-
-    window.addEventListener('resize' , resizeCanvas , false);
-    window.addEventListener('keydown', function(event) {
-        switch (event.keyCode) {
-            case 87: // W
-            case 38: // up
-                head.direction !== "down" ? head.direction = "up" : head.directory=head.directory;
-            break;
-            case 68: // D
-            case 39: // down
-                head.direction !== "left" ? head.direction = "right" : head.directory=head.directory;
-            break;
-            case 65: // A
-            case 37: // left
-                head.direction !== "right" ? head.direction = "left" : head.directory=head.directory;
-            break;
-            case 83: // S
-            case 40: // down
-                head.direction !== "up" ? head.direction = "down" : head.directory=head.directory;
-            break;
-        };
-    });
     function drawBackground(){
         for(var nr=0;nr<backgroundTile.length;nr++){
             backgroundTile[nr].draw();
         };
     }
-    function Rectangle(x , y , color , size , number){
+    function Rectangle(x , y , color ,  number){
         this.x = x;
         this.y = y;
         this.isBackground=false;
         this.direction = "down";
         this.number = number;
-        this.size = size;
+        this.size = snakeSize;
         this.color = color;
         this.draw = function() {
             for(var i = 0 ; i < tail.length ; i++){
@@ -162,9 +139,8 @@
             context.closePath();
         };
     };
-
-    function Apple(Color,size) {
-        this.size = size;
+    function Apple(Color) {
+        this.size = snakeSize;
         this.x = Math.floor(Math.random() * sumX) * this.size;
         this.y = Math.floor(Math.random() * sumY) * this.size;
         this.color=Color;
@@ -172,7 +148,7 @@
             if(this.x === head.x && this.y === head.y){
                 setColor();
                 this.color=color;
-                tail.push(new Rectangle(tail[tail.length-1].x , tail[tail.length - 1].y - snakeSize , "#414143" , snakeSize , tail.length));
+                tail.push(new Rectangle(tail[tail.length-1].x , tail[tail.length - 1].y - snakeSize , "#414143" , tail.length));
                 this.x = Math.floor(Math.random() * sumX) * this.size;
                 this.y = Math.floor(Math.random() * sumY) * this.size;
             };
@@ -183,7 +159,27 @@
             context.closePath();
         };
     };
-
+    window.addEventListener('resize' , resizeCanvas , false);
+    window.addEventListener('keydown', function(event) {
+        switch (event.keyCode) {
+            case 87: // W
+            case 38: // up
+                head.direction !== "down" ? head.direction = "up" : head.directory=head.directory;
+            break;
+            case 68: // D
+            case 39: // down
+                head.direction !== "left" ? head.direction = "right" : head.directory=head.directory;
+            break;
+            case 65: // A
+            case 37: // left
+                head.direction !== "right" ? head.direction = "left" : head.directory=head.directory;
+            break;
+            case 83: // S
+            case 40: // down
+                head.direction !== "up" ? head.direction = "down" : head.directory=head.directory;
+            break;
+        };
+    });
     resizeCanvas();
     restart();
 

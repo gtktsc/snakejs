@@ -3,37 +3,79 @@
 (function() {
     var canvas = document.getElementById('canvas'),
         context = canvas.getContext('2d');
-
+    var canvasWidth = document.getElementById('canvas-wrapper').offsetWidth;
+    var canvasHeight = document.getElementById('canvas-wrapper').offsetHeight;
     var head;
     var tail = [];
     var apple;
     var animation;
+    var color;
     var snakeSize = 40;
-    
+    var backgroundTile=[];
+    var backgroundColor = "white";
+    var backgroundLine = snakeSize/3;
+    var backgroundLineColor = "#505A69";
+    var sumX = (Math.floor(canvasWidth / snakeSize)%2==0?sumX = Math.floor(canvasWidth / snakeSize) : sumX = Math.floor(canvasWidth / snakeSize)-1);
+    var sumY = (Math.floor(canvasHeight / snakeSize)%2==0?sumY = Math.floor(canvasHeight / snakeSize) : sumY = Math.floor(canvasHeight / snakeSize)-1);
+
     function restart(){
-        head = new Rectangle ( (Math.floor(window.innerWidth / snakeSize)/2) * snakeSize , (Math.floor(window.innerHeight / snakeSize)/2) * snakeSize - snakeSize * 2 , "silver" , snakeSize , -1);
-        apple = new Apple ("green" , snakeSize);
+        head = new Rectangle ( (Math.floor(sumX)/2) * snakeSize , (Math.floor(sumY)/2) * snakeSize - snakeSize * 2 , "#A6A099" , snakeSize , -1);
+        setColor();
+        apple = new Apple (color , snakeSize);
         tail = [];
         for(var i=0 ; i < 2 ; i++){
-            tail[i] = new Rectangle (head.x , head.y-snakeSize * (i + 1) , "black" , snakeSize , i);
+            tail[i] = new Rectangle (head.x , head.y-snakeSize * (i + 1) , "#414143" , snakeSize , i);
+        };
+        var nr=0;
+        for(var nrX=0;nrX<sumX;nrX++){
+            for(var nrY=0;nrY<sumY;nrY++){
+            backgroundTile[nr]= new Rectangle (snakeSize*nrX,snakeSize*nrY,backgroundColor,nr);
+            backgroundTile[nr].isBackground=true;
+            backgroundTile[nr].direction="none";
+            nr++;
+            };
         };
         clearInterval(animation);
         animation = setInterval(draw , 200);
     };
-
+    function setColor(){
+        switch(Math.floor(Math.random() * (5))){
+            case 0:
+                color = "#FA575C";
+            break;
+            case 1:
+                color = "#47ADA0";
+            break;
+            case 2:
+                color = "#8F63BF";
+            break;
+            case 3:
+                color = "#FFC90A";
+            break;
+            case 4:
+                color = "#FF823B";
+            break;
+        };
+    };
     function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvasWidth = document.getElementById('canvas-wrapper').offsetWidth;
+        canvasHeight = document.getElementById('canvas-wrapper').offsetHeight;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        sumX = (Math.floor(canvasWidth / snakeSize)%2==0?sumX = Math.floor(canvasWidth / snakeSize) : sumX = Math.floor(canvasWidth / snakeSize)-1);
+        sumY = (Math.floor(canvasHeight / snakeSize)%2==0?sumY = Math.floor(canvasHeight / snakeSize) : sumY = Math.floor(canvasHeight / snakeSize)-1);
+
+        restart();
     };
 
     function draw() {
         context.beginPath();
-        context.clearRect(0 , 0 , window.innerWidth , window.innerHeight);
-        context.rect(0 , 0 , window.innerWidth , window.innerHeight);
+        context.clearRect(0 , 0 , canvasWidth , canvasHeight);
+        context.rect(0 , 0 , canvasWidth , canvasHeight);
         context.fillStyle = 'white';
         context.fill();
         context.closePath();
-
+        drawBackground();
         apple.draw();
         head.draw();
         for(var i = tail.length-1 ; i >= 0 ; i--){
@@ -70,10 +112,15 @@
             break;
         };
     });
-
+    function drawBackground(){
+        for(var nr=0;nr<backgroundTile.length;nr++){
+            backgroundTile[nr].draw();
+        };
+    }
     function Rectangle(x , y , color , size , number){
         this.x = x;
         this.y = y;
+        this.isBackground=false;
         this.direction = "down";
         this.number = number;
         this.size = size;
@@ -84,7 +131,7 @@
                     this.color = "red";
                 };
             };
-            if(this.number === -1 && (this.x < 0 || this.y < 0 || this.x > window.innerWidth || this.y > window.innerHeight)){
+            if(this.number === -1 && (this.x < 0 || this.y < 0 || this.x > canvasWidth || this.y > canvasHeight)){
                 this.color = "red";
             };
             switch(this.direction){
@@ -105,22 +152,29 @@
             };
             context.beginPath();
             context.fillStyle = this.color;
-            context.rect(this.x , this.y , this.size , this.size);
+            if(this.isBackground){
+                context.fillStyle = backgroundLineColor;
+                context.rect(this.x+backgroundLine , this.y+backgroundLine , snakeSize-backgroundLine*2 , snakeSize-backgroundLine*2);
+            }else{
+                context.rect(this.x , this.y , this.size , this.size);
+            };
             context.fill();
             context.closePath();
         };
     };
 
-    function Apple(color,size) {
+    function Apple(Color,size) {
         this.size = size;
-        this.x = Math.floor(Math.random() * (Math.floor(window.innerWidth / this.size) + 1)) * this.size;
-        this.y = Math.floor(Math.random() * (Math.floor(window.innerHeight / this.size) + 1)) * this.size;
-        this.color=color;
+        this.x = Math.floor(Math.random() * sumX) * this.size;
+        this.y = Math.floor(Math.random() * sumY) * this.size;
+        this.color=Color;
         this.draw = function() {
             if(this.x === head.x && this.y === head.y){
-                tail.push(new Rectangle(tail[tail.length-1].x , tail[tail.length - 1].y - snakeSize , "black" , snakeSize , tail.length));
-                this.x = Math.floor(Math.random() * (Math.floor(window.innerWidth / this.size) + 1)) * this.size;
-                this.y = Math.floor(Math.random() * (Math.floor(window.innerHeight / this.size) + 1)) * this.size;
+                setColor();
+                this.color=color;
+                tail.push(new Rectangle(tail[tail.length-1].x , tail[tail.length - 1].y - snakeSize , "#414143" , snakeSize , tail.length));
+                this.x = Math.floor(Math.random() * sumX) * this.size;
+                this.y = Math.floor(Math.random() * sumY) * this.size;
             };
             context.beginPath();
             context.fillStyle = this.color;

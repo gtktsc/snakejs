@@ -10,3 +10,8 @@ body {
 canvas {
   display: block;
 }
+#canvas-wrapper{
+  width: 95vw;
+  height: 95vh;
+  margin:auto;
+}
